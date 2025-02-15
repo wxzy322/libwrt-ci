@@ -100,7 +100,16 @@ jobs:
         mv package/new/custom/speedtest-cli package/new
         rm -rf package/new/custom
         ./scripts/feeds install -a
-  
+
+    - name: Run Custom DIY Script(运行自定义脚本)
+      run: |
+        if [ -f "$DIY_SCRIPT" ]; then
+          cd $OPENWRT_PATH
+          bash ../$DIY_SCRIPT
+        else
+          echo "自定义脚本 $DIY_SCRIPT 未找到。"
+        fi
+
     - name: Load Custom Configuration(加载自定义配置)
       run: |
         [ -e files ] && mv files $OPENWRT_PATH/files
