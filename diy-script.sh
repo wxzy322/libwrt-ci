@@ -17,5 +17,5 @@ sed -i '$a src-git smpackage https://github.com/kenzok8/small-package' feeds.con
 
 
 
-# ./scripts/feeds update -a
-# ./scripts/feeds install -a
+./scripts/feeds update -a
+./scripts/feeds install -a
