@@ -1,4 +1,4 @@
-name: 360v6-6.12
+name: 360v6-imm6.6
 
 on:
   workflow_dispatch:
