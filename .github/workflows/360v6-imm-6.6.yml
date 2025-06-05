@@ -1,4 +1,4 @@
-name: 360v6-imm6.6
+name: 360v6-imm6.12
 
 on:
   workflow_dispatch:
@@ -174,7 +174,7 @@ jobs:
         body: |
           **This is OpenWrt Firmware for ${{ env.FIRMWARE_TAG }}**
           ### 📒 固件信息(WIFI)
-          - imm带WIFI带有线NSS的6.6内核固件
+          - imm带WIFI带有线NSS的6.12内核固件
           - 💻 这是 ${{ env.FIRMWARE_TAG }} 平台使用的 OpenWrt 固件
           - ⚽ 固件源码: ${{ env.REPO_URL }}
           - 💝 源码分支: ${{ env.REPO_BRANCH }}
