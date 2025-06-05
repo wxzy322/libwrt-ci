@@ -1,47 +1,27 @@
-name: Remote SSH Access to GitHub Actions Runner
-
+name: Debug with tmate
 on:
-  workflow_dispatch: # 允许手动触发此工作流
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      debug_enabled:
+        description: 'Run the build with tmate debugging enabled'
+        type: boolean
+        required: false
+        default: false
 
 jobs:
-  remote-ssh:
+  debug:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install tmate
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y tmate
-          # 检查 tmate 是否安装成功
-          if ! command -v tmate &> /dev/null; then
-            echo "tmate installation failed!"
-            exit 1
-          fi
-
-      - name: Start tmate session
-        run: |
-          # 启动 tmate 会话
-          tmate -S /tmp/tmate.sock new-session -d
-          tmate -S /tmp/tmate.sock wait tmate-ready
-          
-          # 检查 tmate 是否成功启动
-          if [ $? -ne 0 ]; then
-            echo "Failed to start tmate session!"
-            exit 1
-          fi
-          
-          # 输出 SSH 和 Web 连接字符串
-          echo "SSH connection string:"
-          tmate -S /tmp/tmate.sock display -p '#{tmate_ssh}'
-          echo "Web connection string:"
-          tmate -S /tmp/tmate.sock display -p '#{tmate_web}'
-        timeout-minutes: 5 # 设置启动 tmate 的超时时间
-
-      - name: Wait for user interaction
-        run: |
-          echo "Waiting for you to finish your operations via SSH..."
-          # 等待 1 小时（可根据需要调整）
-          sleep 3600
-        timeout-minutes: 60 # 设置等待时间为 1 小时
+      - name: Setup tmate session
+        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.debug_enabled || github.event_name == 'push' }}
+        uses: mxschmitt/action-tmate@v3
+        with:
+          limit-access-to-actor: true
+          connect-timeout-seconds: 600
+          detached: true
