@@ -1,17 +1,17 @@
-name: Debug with tmate
+name: SSH Debug Session
+
 on:
-  workflow_dispatch:
-    inputs:
-      debug_enabled:
-        type: boolean
-        description: 'Run the build with tmate debugging enabled'
-        required: false
-        default: false
+  workflow_dispatch:  # 能够手动触发工作流
+
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Setup tmate session
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
         uses: mxschmitt/action-tmate@v3
+        with:
+          limit-access-to-actor: true  # 限定只有触发工作流的用户可以访问
