@@ -1,4 +1,5 @@
-name: 360v6-6.12
+
+name: IPQ60XX-6.12-WIFI
 
 on:
   workflow_dispatch:
@@ -7,9 +8,9 @@ on:
 
 env:
   REPO_URL: https://github.com/LiBwrt/openwrt-6.x.git
-  REPO_BRANCH: kernel-6.12
+  REPO_BRANCH: k6.12-nss
   CONFIG_FILE: configs/360v6-6.12.config
-  DIY_SCRIPT: diy-script.sh
+  DIY_SCRIPT: libwrt.sh
   CLASH_KERNEL: amd64
   CACHE_TOOLCHAIN: true
   UPLOAD_BIN_DIR: false
@@ -100,20 +101,14 @@ jobs:
         mv package/new/custom/speedtest-cli package/new
         rm -rf package/new/custom
         ./scripts/feeds install -a
-
-    - name: Run Custom DIY Script(运行自定义脚本)
-      run: |
-        if [ -f "$DIY_SCRIPT" ]; then
-          cd $OPENWRT_PATH
-          bash ../$DIY_SCRIPT
-        else
-          echo "自定义脚本 $DIY_SCRIPT 未找到。"
-        fi
-
+  
     - name: Load Custom Configuration(加载自定义配置)
       run: |
         [ -e files ] && mv files $OPENWRT_PATH/files
         [ -e $CONFIG_FILE ] && mv $CONFIG_FILE $OPENWRT_PATH/.config
+        chmod +x $DIY_SCRIPT
+        cd $OPENWRT_PATH
+        $GITHUB_WORKSPACE/$DIY_SCRIPT
 
     - name: Download DL Package(下载DL软件包)
       run: |
