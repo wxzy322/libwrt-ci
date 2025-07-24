@@ -1,4 +1,4 @@
-name: IPQ60XX-NOWIFI
+name: 360v6-imm6.12-nikki-HP
 
 on:
   workflow_dispatch:
@@ -6,15 +6,15 @@ on:
   #  - cron: 0 19 * * *
 
 env:
-  REPO_URL: https://github.com/LiBwrt/openwrt-6.x.git
+  REPO_URL: https://github.com/VIKINGYFY/immortalwrt
   REPO_BRANCH: main
-  CONFIG_FILE: configs/ipq60xx-nowifi.config
+  CONFIG_FILE: configs/360v6-imm-nikki-HP.config
   DIY_SCRIPT: diy-script.sh
   CLASH_KERNEL: amd64
   CACHE_TOOLCHAIN: true
   UPLOAD_BIN_DIR: false
   FIRMWARE_RELEASE: true
-  FIRMWARE_TAG: IPQ60XX-NOWIFI
+  FIRMWARE_TAG: 360v6-imm-nikki-HP
   TZ: Asia/Shanghai
 
 jobs:
@@ -63,11 +63,13 @@ jobs:
     - name: Clone Source Code(克隆源代码)
       run: |
         df -hT $GITHUB_WORKSPACE
-        git clone $REPO_URL -b $REPO_BRANCH openwrt
+        git clone --depth 1 -b $REPO_BRANCH $REPO_URL openwrt
         cd openwrt
         echo "OPENWRT_PATH=$PWD" >> $GITHUB_ENV
         VERSION_INFO=$(git show -s --date=short --format="作者: %an<br/>时间: %cd<br/>内容: %s<br/>hash: %H")
         echo "VERSION_INFO=$VERSION_INFO" >> $GITHUB_ENV
+        # VERSION_KERNEL=$(grep -oP 'LINUX_KERNEL_HASH-\K[0-9]+\.[0-9]+\.[0-9]+' include/kernel-6.12)
+        echo "VERSION_KERNEL=$VERSION_KERNEL" >> $GITHUB_ENV
 
     - name: Generate Variables(生成变量)
       run: |
@@ -93,8 +95,21 @@ jobs:
       run: |
         cd $OPENWRT_PATH
         ./scripts/feeds update -a
+        git clone --depth 1 https://github.com/sbwml/openwrt_pkgs.git package/new/custom
+        mv package/new/custom/luci-app-netspeedtest  package/new
+        mv package/new/custom/speedtest-cli package/new
+        rm -rf package/new/custom
         ./scripts/feeds install -a
-  
+
+    - name: Run Custom DIY Script(运行自定义脚本)
+      run: |
+        if [ -f "$DIY_SCRIPT" ]; then
+          cd $OPENWRT_PATH
+          bash ../$DIY_SCRIPT
+        else
+          echo "自定义脚本 $DIY_SCRIPT 未找到。"
+        fi
+
     - name: Load Custom Configuration(加载自定义配置)
       run: |
         [ -e files ] && mv files $OPENWRT_PATH/files
@@ -158,13 +173,14 @@ jobs:
         artifacts: ${{ env.FIRMWARE_PATH }}/*
         body: |
           **This is OpenWrt Firmware for ${{ env.FIRMWARE_TAG }}**
-          ### 📒 固件信息(无WIFI)
-          - 无WIFI带有线NSS的6.6内核固件
+          ### 📒 固件信息(WIFI)
+          - imm带WIFI带有线NSS的6.12内核固件
           - 💻 这是 ${{ env.FIRMWARE_TAG }} 平台使用的 OpenWrt 固件
           - ⚽ 固件源码: ${{ env.REPO_URL }}
           - 💝 源码分支: ${{ env.REPO_BRANCH }}
-          - 🌐 默认地址: 192.168.1.1
+          - 🌐 默认地址: 10.1.1.1
           - 🔑 默认密码: password
           ### 🧊 固件版本
+          - 固件内核版本：${{ env.VERSION_KERNEL }}
           - 固件编译前最后一次➦[主源码](${{ env.REPO_URL }})更新记录
           - ${{ env.VERSION_INFO }}
