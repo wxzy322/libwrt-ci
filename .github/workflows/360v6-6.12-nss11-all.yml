@@ -95,7 +95,7 @@ jobs:
       run: |
         cd $OPENWRT_PATH
         ./scripts/feeds update -a
-        git clone --depth 1 https://github.com/sbwml/openwrt_pkgs.git package/new/custom
+        git clone --depth 1 https://github.com/kenzok8/small-package.git package/new/custom
         mv package/new/custom/luci-app-netspeedtest  package/new
         mv package/new/custom/speedtest-cli package/new
         rm -rf package/new/custom
@@ -108,7 +108,6 @@ jobs:
         chmod +x $DIY_SCRIPT
         cd $OPENWRT_PATH
         $GITHUB_WORKSPACE/$DIY_SCRIPT
-        ./scripts/feeds update -a && ./scripts/feeds install -a
 
     - name: Download DL Package(下载DL软件包)
       run: |
