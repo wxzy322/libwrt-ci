@@ -1,4 +1,4 @@
-name: 360v6-6.12-upnp
+name: 360v6-6.12-nss11-all
 
 on:
   workflow_dispatch:
@@ -14,7 +14,7 @@ env:
   CACHE_TOOLCHAIN: true
   UPLOAD_BIN_DIR: false
   FIRMWARE_RELEASE: true
-  FIRMWARE_TAG: IPQ60XX-6.12-WIFI-upnp
+  FIRMWARE_TAG: IPQ60XX-6.12-nss11-all
   TZ: Asia/Shanghai
 
 jobs:
